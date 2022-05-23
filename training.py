@@ -10,23 +10,25 @@ import json
 
 ###################Load config.json and get path variables
 with open('config.json','r') as f:
-    config = json.load(f) 
+    config = json.load(f)
 
-dataset_csv_path = os.path.join(config['output_folder_path']) 
-model_path = os.path.join(config['output_model_path']) 
-
+dataset_csv_path = os.path.join(config['output_folder_path'])
+model_path       = os.path.join(config['output_model_path'])
 
 #################Function for training the model
 def train_model():
-    
+    df = pd.read_csv(dataset_csv_path +'/finaldata.csv')
+    LM_A = list(df['lastmonth_activity'])
+    LY_A = list(df['lastyear_activity'])
+    N_E  = list(df['number_of_employees'])
+    y  = np.asarray(list(df['exited']))
+    X = np.asarray([LM_A,LY_A,N_E]).T
     #use this logistic regression for training
-    LogisticRegression(C=1.0, class_weight=None, dual=False, fit_intercept=True,
-                    intercept_scaling=1, l1_ratio=None, max_iter=100,
-                    multi_class='warn', n_jobs=None, penalty='l2',
-                    random_state=0, solver='liblinear', tol=0.0001, verbose=0,
-                    warm_start=False)
-    
+    LG = LogisticRegression()
     #fit the logistic regression to your data
-    
+    LG.fit(X,y)
     #write the trained model to your workspace in a file called trainedmodel.pkl
+    pickle.dump(LG, open(model_path + '/trainedmodel.pkl', 'wb'))
 
+if __name__ == '__main__':
+    train_model()
