@@ -6,29 +6,33 @@ import os
 from sklearn import metrics
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
 import json
+from data_prep import *
 
 ###################Load config.json and get path variables
 with open('config.json','r') as f:
     config = json.load(f)
 
-dataset_csv_path = os.path.join(config['output_folder_path'])
+output_folder_path = os.path.join(config['output_folder_path'])
 model_path       = os.path.join(config['output_model_path'])
 
+
 #################Function for training the model
-def train_model():
-    df = pd.read_csv(dataset_csv_path +'/finaldata.csv')
-    LM_A = list(df['lastmonth_activity'])
-    LY_A = list(df['lastyear_activity'])
-    N_E  = list(df['number_of_employees'])
-    y  = np.asarray(list(df['exited']))
-    X = np.asarray([LM_A,LY_A,N_E]).T
+def train_model(ext=''):
+    fversion = open(output_folder_path + '/train_data_versions.txt','r').readlines()[-1].replace('\n','')
+    print("Reading " + fversion )
+    df = pd.read_csv(fversion)
+    X,y = prep_data(df)
+
+    print("Training input shape {} and output shape {}".format(X.shape,y.shape))
     #use this logistic regression for training
-    LG = LogisticRegression()
+    LG = LogisticRegression(C=1.0, solver='liblinear', max_iter=500).fit(X,y)
     #fit the logistic regression to your data
-    LG.fit(X,y)
     #write the trained model to your workspace in a file called trainedmodel.pkl
-    pickle.dump(LG, open(model_path + '/trainedmodel.pkl', 'wb'))
+    model_file = model_path + '/trainedmodel' + ext + '.sav'
+    print("Saving " + model_file)
+    pickle.dump(LG, open(model_file, 'wb'))
 
 if __name__ == '__main__':
     train_model()

@@ -1,0 +1,1 @@
+*/10 * * * * /Users/raminanushiravani/miniconda3/bin/python /Users/raminanushiravani/Desktop/risk_assessment/fullprocess.py >> /Users/raminanushiravani/Desktop/risk_assessment/cron.log 2>&1

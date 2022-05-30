@@ -7,11 +7,12 @@ import json
 import pickle
 import subprocess
 import copy
+from data_prep import *
 ##################Load config.json and get environment variables
 with open('config.json','r') as f:
     config = json.load(f)
 
-dataset_csv_path = os.path.join(config['output_folder_path'])
+output_folder_path = os.path.join(config['output_folder_path'])
 test_data_path = os.path.join(config['test_data_path'])
 model_path = os.path.join(config['output_model_path'])
 
@@ -19,20 +20,20 @@ model_path = os.path.join(config['output_model_path'])
 ##################Function to get model predictions
 def model_predictions():
     #read the deployed model and a test dataset, calculate predictions
-    LG  = pickle.load(open(model_path + '/trainedmodel.pkl','rb'))
+    LG  = pickle.load(open(model_path + '/trainedmodel.sav','rb'))
     df = pd.read_csv(test_data_path + '/testdata.csv')
-    LM_A = list(df['lastmonth_activity'])
-    LY_A = list(df['lastyear_activity'])
-    N_E  = list(df['number_of_employees'])
-    y  = np.asarray(list(df['exited']))
-    X = np.asarray([LM_A,LY_A,N_E]).T
+    sc_file = model_path + '/scaler.sav'
+    scaler = pickle.load(open(sc_file, 'rb'))
+    X,y = prep_data(df, scaler)
     y_predict = list(LG.predict(X))
     return y_predict#return value should be a list containing all predictions
 
 ##################Function to get summary statistics
 def dataframe_summary():
     #calculate summary statistics here
-    df = pd.read_csv(dataset_csv_path + '/finaldata.csv')
+    fversion = open(output_folder_path + '/train_data_versions.txt','r').readlines()[-1].replace('\n','')
+    print("Reading " + fversion )
+    df = pd.read_csv(fversion)
     df.drop('Unnamed: 0', axis = 1,inplace=True)
     list_statistics = {}
     for col in df.columns:
@@ -45,6 +46,7 @@ def dataframe_summary():
             std = round(np.std(values),3)
             list_statistics[col] = [mu,med,std,nan_percent]
         else:
+            # Counting NAN values 
             nan_percent = 1-(len(df[col].dropna())/len(values))
             list_statistics[col] = [nan_percent]
     return list_statistics#return value should be a list containing all summary statistics
@@ -54,8 +56,8 @@ def execution_time():
     #calculate timing of training.py and ingestion.py
     training_time = timeit.timeit("train_model()","from training import train_model",number=1)
     ingestion_time = timeit.timeit("merge_multiple_dataframe()","from ingestion import merge_multiple_dataframe",number=1)
-
-    return training_time,ingestion_time#return a list of 2 timing values in seconds
+    times = [(ingestion_time),(training_time)]
+    return str(times) #return a list of 2 timing values in seconds
 
 ##################Function to check dependencies
 def outdated_packages_list():
