@@ -4,17 +4,29 @@ First,
 
   run firstRun.py
   
-    -- this will ingest existing data then concatenate dataframes --> from practicedata/ and save it in ingesteddata/finaldata2.csv \n
+    -- this will ingest existing data then concatenate dataframes --> 
     
-    -- run training.py a logistic regression model --> practicemodels/trainedmodel.sav and practicemodels/scaler.sav  and ingesteddata/train_data_version.txt \n
+    from practicedata/ and save it in ingesteddata/finaldata2.csv 
     
-    -- run scoring.py the model on test dataset --> practicemodels/latestscore.txt \n
+    -- run training.py a logistic regression model -->
     
-    -- run deployment.py it --> copy data from practicemodels/ to production_deployment and models \n
+    practicemodels/trainedmodel.sav and practicemodels/scaler.sav  and ingesteddata/train_data_version.txt 
     
-    -- run diagnostics.py --> reads in from ingesteddata/train_data_version.txt and statistics from practicemodels/
+    -- run scoring.py the model on test dataset -->
     
-    -- run reporting.py --> saves practicemodels/confusionmatrix.png using the model from practicemodels/
+    practicemodels/latestscore.txt \n
+    
+    -- run deployment.py it --> 
+    
+    copy data from practicemodels/ to production_deployment and models \n
+    
+    -- run diagnostics.py --> 
+    
+    reads in from ingesteddata/train_data_version.txt and statistics from practicemodels/
+    
+    -- run reporting.py --> 
+    
+    saves practicemodels/confusionmatrix.png using the model from practicemodels/
 
 Second,
 
@@ -22,15 +34,15 @@ Second,
   
     -- Reads in the existing ingested files text files, and check to see if there are any new files added.
     
-    -- If no new data is added (from sourcedata/), it will ingest them using ingestion.py --> this will ingesteddata/finaldata4.csv as well as a new test dataset called testdata/testdata_new.csv and update test_data_versions.txt and train_data_version.txt
+    -- If no new data is added (from sourcedata/), it will ingest them using ingestion.py --> 
+    
+    this will ingesteddata/finaldata4.csv as well as a new test dataset called testdata/testdata_new.csv and update test_data_versions.txt and train_data_version.txt
     
     -- It will then read the latestscore.txt from last step and if the score on the new test dataset is less than the score from last step, it will train a new model on the new ingested training data, ingesteddata/finaldata4.csv and redploy it.
     
     -- It will then diagnostics.py and reporting.py as well as apicalls.py (app.py should have been ran before hand.)
 
 
-
-############################################################################################################
 
 /practicedata/. This is a directory that contains some data you can use for practice.
 
